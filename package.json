@@ -1,0 +1,23 @@
+{
+  "name": "ipynbsplit",
+  "version": "1.0.0",
+  "description": "Explodes a Jupyter Notebook file (ipynb) into numbered section files, one per cell",
+  "license": "Apache-2.0",
+  "author": "Manuel Freire Morán <manuel.freire@fdi.ucm.es>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "jupyter notebooks",
+    "ipynb"
+  ],
+  "bin": {
+   "isplit": "./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manuel-freire/ipynbsplit"
+  }
+}
