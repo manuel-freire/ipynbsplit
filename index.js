@@ -66,17 +66,27 @@ function splitIpynb(inputPath, outputDir, dryRun) {
       let outputExtension = "txt";
 
       outputs.forEach((output, outIndex) => {
-        if (output.data["application/vnd.plotly.v1+json"] !== undefined) {
-          // expect a config, data, and layout
-          const plotlyData = output.data["application/vnd.plotly.v1+json"].data;
-          const plotlyLayout = output.data["application/vnd.plotly.v1+json"].layout;
-          outputContents.push(createPlotlyHtml(plotlyData, plotlyLayout));
-          outputExtension = "html";
-        } else if (output.data["text/html"] !== undefined) {
-          outputContents.push(output.data["text/html"].join(""));
-          outputExtension = "html";
-        } else {
-          console.warn(`Warning: unhandled output type ${output.data[0]} in cell ${index + 1}`);
+        try {
+          if (output.output_type === "stream" && output.text) {
+            outputContents.push(output.text.join(""));
+          } else if (output.data["image/png"] !== undefined) {
+            outputContents.push(Buffer.from(output.data["image/png"], "base64"));
+            outputExtension = "png";
+          } else if (output.data["application/vnd.plotly.v1+json"] !== undefined) {
+            // expect a config, data, and layout
+            const plotlyData = output.data["application/vnd.plotly.v1+json"].data;
+            const plotlyLayout = output.data["application/vnd.plotly.v1+json"].layout;
+            outputContents.push(createPlotlyHtml(plotlyData, plotlyLayout));
+            outputExtension = "html";
+          } else if (output.data["text/html"] !== undefined) {
+            outputContents.push(output.data["text/html"].join(""));
+            outputExtension = "html";
+          } else {
+            console.warn(`Warning: unhandled output type ${output.data[0]} in cell ${index + 1}`);
+            outputContents.push(JSON.stringify(output));
+          }
+        } catch (err) {
+          console.warn(`Warning: failed to process output ${outIndex + 1} of cell ${index + 1}: ${err}`);
           outputContents.push(JSON.stringify(output));
         }
         
